@@ -82,6 +82,17 @@ def getfinalrank():
     messagebox.showinfo(message=final_rank, title=f"Ranking de {nombre}")
 
 
+def gettotrial(boton, combobox, label):
+    categoria = combobox.get()
+    if categoria != '':
+        boton.place_forget()
+        combobox.place_forget()
+        label.place_forget()
+        return categoria
+
+    else:
+        messagebox.showinfo(title='Error', message='Debes introducir una categoría')
+
 
 root = tkinter.Tk()
 root.title("Ranking ESP Junior")
@@ -99,22 +110,14 @@ root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
 
 selectcategory = tkinter.Label(root, text='Selecciona categoria:')
-selectcategory.place(x=240 , y=30)
+selectcategory.place(x=window_width/2, y=window_height/2 - 40, anchor='center', relheight=0.1)
 
-botonsub19 = ttk.Button(root, text='Sub 19')
-botonsub19.place(x=48, y=36)
+categorylist = ttk.Combobox(root, values=['Sub 19', 'Sub 17', 'Sub 15', 'Sub 13', 'Sub 11'], state='readonly')
+categorylist.place(x=window_width/2, y=window_height/2, anchor='center', relheight=0.1)
 
-botonsub17 = ttk.Button(root, text='Sub 17')
-botonsub17.place(x=432, y=36)
+botoncategoria = ttk.Button(root, text='Siguiente', command=lambda: gettotrial(botoncategoria, categorylist, selectcategory))
+botoncategoria.place(x=window_width/2, y=window_height/2 + 50, anchor='center')
 
-botonsub15 = ttk.Button(root, text='Sub 15')
-botonsub15.place(x=240, y=180)
-
-botonsub13 = ttk.Button(root, text='Sub 13')
-botonsub13.place(x=48, y=324)
-
-botonsub11 = ttk.Button(root, text='Sub 11')
-botonsub11.place(x=432, y=324)
 
 root.mainloop()
 
