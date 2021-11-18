@@ -56,9 +56,10 @@ Goes to the specified player specified as player.
 
 
 def getposition(soup): #TODO fix this thing
+    nombrepareja = 'PABLO SERRANO TASSIS'
     a = str(soup.find_all('table', {'class': 'ruler'}))
     b = a.partition('IM Sub 19</a></td><td></td><td class="rank"><div style="">')[2]
-    c = a.partition('PABLO SERRANO TASSIS</a></td><td class="rank"><div style="">')[2]
+    c = a.partition(f'{nombrepareja}</a></td><td class="rank"><div style="">')[2]
     return b.partition('</div>')[0], c.partition('</div>')[0]
 
 '''
@@ -75,23 +76,94 @@ def getfinalrank():
     specified_category_data = getdata(category_link)
     oviedo = category_link + '&ogid' + gotooviedo(specified_category_data)
     oviedo_data = getdata(oviedo)
-    player = gotoplayer(oviedo_data, nombre)
-
+    player = gotoplayer(oviedo_data, nombre[0])
     player_data = getdata(player)
-    final_rank = f'IM 19: {getposition(player_data)[0]} \nDM 19 Pablo Serrano: {getposition(player_data)[1]}'
-    messagebox.showinfo(message=final_rank, title=f"Ranking de {nombre}")
+    final_position = getposition(player_data)
+    return final_position
 
 
-def gettotrial(boton, combobox, label):
-    categoria = combobox.get()
-    if categoria != '':
+def gettocategory(label, combobox, button):
+    label.place(x=window_width / 2, y=window_height / 2 - 40, anchor='center', relheight=0.1)
+    combobox.place(x=window_width / 2, y=window_height / 2, anchor='center', relheight=0.1)
+    button.place(x=window_width/2, y=window_height/2 + 50, anchor='center')
+
+
+def gettotrial(boton, combobox, label, combobox1, label1, boton1, boton2, lista):
+    lista.clear()
+    categoriaa = combobox.get()
+    if categoriaa != '':
+        lista.append(categoriaa)
         boton.place_forget()
         combobox.place_forget()
         label.place_forget()
-        return categoria
+        combobox1.place(x=window_width/2, y=window_height/2, anchor='center', relheight=0.1)
+        label1.place(x=window_width/2, y=window_height/2 - 40, anchor='center', relheight=0.1)
+        boton1.place(x=window_width / 2 + 100, y=window_height / 2 + 100, anchor='center')
+        boton2.place(x=window_width/2, y=window_height/2 + 50, anchor='center')
 
     else:
-        messagebox.showinfo(title='Error', message='Debes introducir una categoría')
+        messagebox.showinfo(title='Error', message='Debes seleccionar una categoría.')
+
+
+def gobackcategory(combobox, boton, label, boton1, label1, combobox1):
+    boton.place(x=window_width/2, y=window_height/2 + 50, anchor='center')
+    combobox.place(x=window_width/2, y=window_height/2, anchor='center', relheight=0.1)
+    label.place(x=window_width / 2, y=window_height / 2 - 40, anchor='center', relheight=0.1)
+    boton1.place_forget()
+    label1.place_forget()
+    combobox1.place_forget()
+
+
+def gettoplayers(boton, combobox, label, combobox1, label1, boton1, boton2, boton3, lista):
+    lista.clear()
+    modalidadd = combobox.get()
+    if modalidadd != '':
+        lista.append(modalidadd)
+        boton.place_forget()
+        combobox.place_forget()
+        label.place_forget()
+        boton2.place_forget()
+        combobox1.place(x=window_width/2, y=window_height/2, anchor='center', relheight=0.1)
+        label1.place(x=window_width/2, y=window_height/2 - 40, anchor='center', relheight=0.1)
+        boton1.place(x=window_width/2, y=window_height/2 + 50, anchor='center')
+        boton3.place(x=window_width / 2 + 100, y=window_height / 2 + 100, anchor='center')
+
+    else:
+        messagebox.showinfo(title='Error', message='Debes seleccionar una modalidad.')
+
+
+def gobackplayers(boton, combobox, label, boton1, combobox1, label1, boton2, boton3):
+    boton.place(x=window_width / 2, y=window_height / 2 + 50, anchor='center')
+    combobox.place(x=window_width / 2, y=window_height / 2, anchor='center', relheight=0.1)
+    label.place(x=window_width / 2, y=window_height / 2 - 40, anchor='center', relheight=0.1)
+    boton3.place(x=window_width / 2 + 100, y=window_height / 2 + 100, anchor='center')
+    boton1.place_forget()
+    combobox1.place_forget()
+    label1.place_forget()
+    boton2.place_forget()
+
+
+def getranking(boton, combobox, label, boton1, label1, combobox1, boton2, lista):
+    lista.clear()
+    nombree = combobox.get()
+    if nombree != '':
+        lista.append(nombree)
+        boton.place_forget()
+        combobox.place_forget()
+        label.place_forget()
+        boton1.place_forget()
+        messagebox.showinfo(title=f'Ranking de {nombree}', message=f'{getfinalrank()}')
+        gettocategory(label1, combobox1, boton2)
+
+    else:
+        messagebox.showinfo(title='Error', message='Debes seleccionar un jugador.')
+
+
+categoria = []
+
+modalidad = []
+
+nombre = []
 
 
 root = tkinter.Tk()
@@ -109,16 +181,33 @@ center_y = int(screen_height/2 - window_height / 2)
 root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
 
+
 selectcategory = tkinter.Label(root, text='Selecciona categoria:')
-selectcategory.place(x=window_width/2, y=window_height/2 - 40, anchor='center', relheight=0.1)
 
-categorylist = ttk.Combobox(root, values=['Sub 19', 'Sub 17', 'Sub 15', 'Sub 13', 'Sub 11'], state='readonly')
-categorylist.place(x=window_width/2, y=window_height/2, anchor='center', relheight=0.1)
+selectmodalidad = tkinter.Label(root, text='Selecciona modalidad:')
 
-botoncategoria = ttk.Button(root, text='Siguiente', command=lambda: gettotrial(botoncategoria, categorylist, selectcategory))
-botoncategoria.place(x=window_width/2, y=window_height/2 + 50, anchor='center')
+selectplayer = tkinter.Label(root, text='Selecciona un jugador:')
 
+
+
+categorialist = ttk.Combobox(root, values=['Sub 19', 'Sub 17', 'Sub 15', 'Sub 13', 'Sub 11'], state='readonly')
+
+modalidadlist = ttk.Combobox(root, value=['IM', 'IF', 'DM', 'DF', 'DX'], state='readonly')
+
+playerlist = ttk.Combobox(root, value=['1'], state='readonly')
+
+
+
+botoncategoria = ttk.Button(root, text='Siguiente', command=lambda: gettotrial(botoncategoria, categorialist, selectcategory, modalidadlist, selectmodalidad, botonvolvercategoria, botonmodalidad, categoria))
+
+botonmodalidad = ttk.Button(root, text='Siguiente', command=lambda: gettoplayers(botonmodalidad, modalidadlist, selectmodalidad, playerlist, selectplayer, botonjugador, botonvolvercategoria, botonvolvermodalidad, modalidad))
+
+botonvolvercategoria = ttk.Button(root, text='Volver', command=lambda: gobackcategory(categorialist, botoncategoria, selectcategory, botonvolvercategoria, selectmodalidad, modalidadlist))
+
+botonjugador = ttk.Button(root, text='Siguiente', command=lambda: getranking(botonjugador, playerlist, selectplayer, botonvolvermodalidad, selectcategory, categorialist, botoncategoria, nombre))
+
+botonvolvermodalidad = ttk.Button(root, text='Volver', command=lambda: gobackplayers(botonmodalidad, modalidadlist, selectmodalidad, botonvolvermodalidad, playerlist, selectplayer, botonjugador, botonvolvercategoria))
+
+gettocategory(selectcategory, categorialist, botoncategoria)
 
 root.mainloop()
-
-
