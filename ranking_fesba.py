@@ -12,6 +12,7 @@ def getdata(url):
     soup = BeautifulSoup(r.text, 'html.parser')
     return soup
 
+
 '''
 Gets the structure of the page  inputted
 '''
@@ -20,15 +21,17 @@ Gets the structure of the page  inputted
 def ranking_link(soup):
     return soup.find_all('a', {'class': 'morelink'})[-1]['href']
 
+
 '''
 Gets the link for the whole ranking (not a specified category)
 '''
 
 
-def gotocategory(soup, category):
+def gotocategory(soup, string):
     a = str(soup.find_all('table', {'class': 'ruler'}))
-    b = a.partition(f'">{category}')[0]
+    b = a.partition(f'">{string}')[0]
     return urljoin('https://www.badminton.es/ranking/', b.split('<th colspan="11"><a href="')[-1]).replace('amp;', '')
+
 
 '''
 Gets the link for the ranking of the specified category (referred as category), takes the data from the ranking page.
@@ -41,26 +44,31 @@ def gotooviedo(soup):
     c = b.partition('Asturias')[2]
     return c.split('ogid')[1]
 
+
 '''
 Goes to the Oviedo team, now inside the specified category.
 '''
+
 
 def gotoplayer(soup, name):
     a = str(soup.find_all('table', {'class': 'ruler'}))
     b = a.partition(f'">{name.upper()}')[0]
     return urljoin('https://www.badminton.es/ranking/', b.split('href="')[-1].replace('amp;', ''))
 
+
 '''
 Goes to the specified player specified as player.
 '''
 
 
-def getposition(soup): #TODO fix this thing
+def getposition(soup):  # TODO fix this thing
     nombrepareja = 'PABLO SERRANO TASSIS'
+    categoria = f'{modalidad[0]} {category[0]}'
     a = str(soup.find_all('table', {'class': 'ruler'}))
-    b = a.partition('IM Sub 19</a></td><td></td><td class="rank"><div style="">')[2]
+    b = a.partition(f'{categoria}</a></td><td></td><td class="rank"><div style="">')[2]
     c = a.partition(f'{nombrepareja}</a></td><td class="rank"><div style="">')[2]
     return b.partition('</div>')[0], c.partition('</div>')[0]
+
 
 '''
 Gets the position of the player on each category where he/she participates.
@@ -72,6 +80,7 @@ def getfinalrank():
     ranking = ranking_link(fesba_data)
     ranking_page = urljoin(web_fesba, ranking)
     ranking_page_data = getdata(ranking_page)
+    categoria = f'{modalidad[0]} {category[0]}'
     category_link = gotocategory(ranking_page_data, categoria)
     specified_category_data = getdata(category_link)
     oviedo = category_link + '&ogid' + gotooviedo(specified_category_data)
@@ -127,6 +136,13 @@ def gettoplayers(boton, combobox, label, combobox1, label1, boton1, boton2, boto
         label1.place(x=window_width/2, y=window_height/2 - 40, anchor='center', relheight=0.1)
         boton1.place(x=window_width/2, y=window_height/2 + 50, anchor='center')
         boton3.place(x=window_width / 2 + 100, y=window_height / 2 + 100, anchor='center')
+        categoria = f'{modalidad[0]} {category[0]}'
+        for k, v in dictnombres.items():
+            if k == categoria:
+                uwu = v.copy()
+                listadenombres.extend(uwu)
+                print(listadenombres)
+        combobox1['value'] = listadenombres
 
     else:
         messagebox.showinfo(title='Error', message='Debes seleccionar una modalidad.')
@@ -159,12 +175,33 @@ def getranking(boton, combobox, label, boton1, label1, combobox1, boton2, lista)
         messagebox.showinfo(title='Error', message='Debes seleccionar un jugador.')
 
 
-categoria = []
+category = []
 
 modalidad = []
 
 nombre = []
 
+listadenombres = []
+
+dictnombres = {
+    'IM Sub 19': ['ADRIAN ALVAREZ GONZALEZ', 'MARCOS GARCIA MARTINEZ', 'ALFONSO PINTO GARCIA',
+                  'JESUS DE BURGOS MAZAIRA', 'ALEJANDRO LOPEZ ALVAREZ', 'Adolfo López González'],
+
+    'IF Sub 19': ['LAURA ALVAREZ GONZALEZ', 'JANA VILLANUEVA AGENJO', 'LEYRE SUBERVIOLA USTARROZ',
+                  'AINARA FERNÁNDEZ SUCO', 'VIOLETA MIGOYA GIL', 'RAQUEL SOTO MARTÍNEZ', 'IRENE FERNANDEZ FERNANDEZ',
+                  'LAURA GARIJO GOMEZ', 'IRIA JUNCAL PINTO GARCIA', 'OLAYA GARCIA FERNANDEZ'],
+
+    'DM Sub 19': ['JESUS DE BURGOS MAZAIRA', 'ALFONSO PINTO', 'MARCOS GARCIA MARTINEZ'],
+    'DF Sub 19': ['OLAYA GARCIA FERNANDEZ', 'JANA VILLANUEVA AGENJO', 'AINARA FERNANDEZ SUCO', 'VIOLETA MIGOYA GIL',
+                  'IRENE FERNADEZ FERNANDEZ', 'NATALIA LAMARCA GARCÍA', 'RAQUEL SOTO MARTÍNEZ'],
+
+    'DX Sub 19': ['Adolfo López González', 'OLAYA GARCIA FERNANDEZ', 'ALEJANDRO LOPEZ ALVAREZ',
+                  'LEYRE SUBERVIOLA USTARROZ', 'JESUS DE BURGOS MAZAIRA', 'NATALIA LAMARCA GARCÍA'],
+    'IM Sub 17': ['ALEJANDRO LOPEZ ALVAREZ', 'JESUS DE BURGOS MAZAIRA', 'Adolfo López González', 'Yago García Fernandez'],
+    'IF Sub 17': ['VIOLETA MIGOYA GIL', 'IRENE FERNANDEZ FERNANDEZ', 'LAURA GARIJO GOMEZ', 'MIREYA PEREZ CANO'],
+    'DM Sub 17': ['JESUS DE BURGOS MAZAIRA', 'Adolfo López González'],
+    'DF Sub 17': []
+}
 
 root = tkinter.Tk()
 root.title("Ranking ESP Junior")
@@ -181,24 +218,20 @@ center_y = int(screen_height/2 - window_height / 2)
 root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
 
-
 selectcategory = tkinter.Label(root, text='Selecciona categoria:')
 
 selectmodalidad = tkinter.Label(root, text='Selecciona modalidad:')
 
 selectplayer = tkinter.Label(root, text='Selecciona un jugador:')
 
-
-
 categorialist = ttk.Combobox(root, values=['Sub 19', 'Sub 17', 'Sub 15', 'Sub 13', 'Sub 11'], state='readonly')
 
 modalidadlist = ttk.Combobox(root, value=['IM', 'IF', 'DM', 'DF', 'DX'], state='readonly')
 
-playerlist = ttk.Combobox(root, value=['1'], state='readonly')
+playerlist = ttk.Combobox(root, value=[listadenombres], state='readonly')
 
 
-
-botoncategoria = ttk.Button(root, text='Siguiente', command=lambda: gettotrial(botoncategoria, categorialist, selectcategory, modalidadlist, selectmodalidad, botonvolvercategoria, botonmodalidad, categoria))
+botoncategoria = ttk.Button(root, text='Siguiente', command=lambda: gettotrial(botoncategoria, categorialist, selectcategory, modalidadlist, selectmodalidad, botonvolvercategoria, botonmodalidad, category))
 
 botonmodalidad = ttk.Button(root, text='Siguiente', command=lambda: gettoplayers(botonmodalidad, modalidadlist, selectmodalidad, playerlist, selectplayer, botonjugador, botonvolvercategoria, botonvolvermodalidad, modalidad))
 
